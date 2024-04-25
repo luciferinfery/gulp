@@ -1,18 +1,34 @@
-const gulp = require('gulp');
+const { src, dest, parallel, series } = require('gulp');
+const sass = require('gulp-sass')(require('sass'));
+const pug = require('gulp-pug');
+const browserSync = require('browser-sync').create();
 
-gulp.task('html', function() {
-    return gulp.src('layout-projec/**/*.html')
-        .pipe(gulp.dest('dist'));
-});
+const browserSyncJob = () => {
+    browserSync.init({
+        server: "build/"
+    });
+};
 
-gulp.task('css', function() {
-    return gulp.src('layout-projec/**/*.css')
-        .pipe(gulp.dest('dist'));
-});
+const buildSass = () => {
+    console.log('Компиляция SASS');
 
-gulp.task('js', function() {
-    return gulp.src('layout-projec/**/*.js')
-        .pipe(gulp.dest('dist'));
-});
+    return src('dist/scss/*.scss')
+        .pipe(sass())
+        .pipe(dest('build/styles/'))
+        .pipe(browserSync.stream());
+}
 
-gulp.task('default', gulp.parallel('html', 'css', 'js'));
+const buildPug = () => {
+    console.log('Компиляция Pug');
+
+    return src('dist/pages/*.pug')
+        .pipe(pug())
+        .pipe(dest('build/'))
+        .pipe(browserSync.stream());
+}
+
+const development = series(parallel(buildSass, buildPug), browserSyncJob);
+
+exports.development = development;
+exports.server = browserSyncJob;
+exports.build = parallel(buildSass, buildPug);
