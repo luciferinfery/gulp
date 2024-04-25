@@ -1,18 +1,28 @@
 const gulp = require('gulp');
+const tinify = require('gulp-tinify');
+const uglify = require('gulp-uglify');
+const sass = require('gulp-sass')(require('sass'));
+const apiKey = 'KvwBMg5TGfwv9xTjfFN0ddcWFYj8Hjw4'
 
-gulp.task('html', function() {
-    return gulp.src('layout-projec/**/*.html')
-        .pipe(gulp.dest('dist'));
-});
+function compileSass() {
+    console.log('Compiling Sass files...');
+    return gulp.src('layout-projec/src/sass/**/*.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest('dist/css'));
+}
 
-gulp.task('css', function() {
-    return gulp.src('layout-projec/**/*.css')
-        .pipe(gulp.dest('dist'));
-});
+function compressImages() {
+    console.log('Compressing images...');
+    return gulp.src('layout-projec/src/img/**/*')
+        .pipe(tinify(apiKey))
+        .pipe(gulp.dest('dist/img'));
+}
 
-gulp.task('js', function() {
-    return gulp.src('layout-projec/**/*.js')
-        .pipe(gulp.dest('dist'));
-});
+function minifyJS() {
+    console.log('Minifying JS files...');
+    return gulp.src('layout-projec/src/js/**/*.js')
+        .pipe(uglify())
+        .pipe(gulp.dest('dist/js'));
+}
 
-gulp.task('default', gulp.parallel('html', 'css', 'js'));
+exports.default = gulp.series(compileSass, gulp.parallel(compressImages, minifyJS));
