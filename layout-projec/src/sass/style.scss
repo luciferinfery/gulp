@@ -1,0 +1,12 @@
+$primary-color: #ff6347;
+
+body {
+  background-color: $primary-color;
+  color: white;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
